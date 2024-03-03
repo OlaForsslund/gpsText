@@ -1,0 +1,39 @@
+{
+	Tools = ordered() {
+		Text1 = TextPlus {
+			CtrlWZoom = false,
+			Inputs = {
+				GlobalOut = Input { Value = 5577, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				Center = Input { Value = { 0.473039215686274, 0.21656976744186 }, },
+				LayoutRotation = Input { Value = 1, },
+				TransformRotation = Input { Value = 1, },
+				Softness1 = Input { Value = 1, },
+				StyledText = Input {
+					SourceOp = "TimeCode1",
+					Source = "Time",
+					Expression = "Text(\"hej\")",
+				},
+				Font = Input { Value = "Open Sans", },
+				Style = Input { Value = "Bold", },
+				VerticalJustificationNew = Input { Value = 3, },
+				HorizontalJustificationNew = Input { Value = 3, },
+				TabSpacing = Input { Value = 1, },
+				FrameRenderScript = Input { Value = "i=math.floor( time*gpsHz/fps )\nspeed=0\nif( i < #gpsSpeed3d ) then\n    speed = gpsSpeed3d[i]\nend\nif( i < #gpsAltitude ) then\n    altitude = gpsAltitude[i]\nend\nspeed_ms = string.format(\"%5.1f\", speed) \nspeed_kmh = string.format(\"%5.1f\", speed*3.6) \nelevation = string.format(\"%5.f\", altitude)\n\nself.StyledText=Text(speed_ms .. \" m/s (\" .. speed_kmh .. \" km/h) \" .. elevation .. \" möh\"  )", },
+				StartRenderScripts = Input { Value = 1, },
+				StartRenderScript = Input { Value = "print(\"GPS loading started\")\nmediaprops = MediaIn1:GetData('MediaProps')\nlocal mediaPath = tostring(mediaprops.MEDIA_PATH)\nprint(mediaPath)\npath = mediaPath..\".track\"\n\n-- Try to open track, if not exist, try to create one using exiftool\nfile, err = io.open(path, \"r\")\nif not file then \n	command = \"exiftool -ee3 \\\"\" .. mediaPath .. \"\\\" > \\\"\"  .. path .. \"\\\"\"\n	os.execute( command )\n	print( command )\n	file, err = io.open(path , \"r\")\nend\nif not file then\n	print(\"Error using exiftool to create the file \" .. path )    \nelse\n    print(\"Loaded track: \" .. path)\n	-- Initialize an array to store the numeric values\n	gpsSpeed3d = {}\n    gpsAltitude = {}\n	-- Pattern to match lines containing \"GPS Speed 3D : <number>\"\n	local patternSpeed3d = \"GPS%s+Speed%s+3D%s+:%s+([%-%d%.?%d*]+)\"\n	local patternAltitude =  \"GPS%s+Altitude%s+:%s+([%-%d%.?%d*]+)\"\n	\n    for line in file:lines() do\n		-- Match the pattern in the current line\n		local number = line:match(patternSpeed3d)\n		if number then\n			-- Convert the matched number to a floating-point value and add it to the array\n			table.insert(gpsSpeed3d, tonumber(number))\n        else\n            number = line:match(patternAltitude)\n            if number then\n                -- Convert the matched number to a floating-point value and add it to the array\n                table.insert(gpsAltitude, tonumber(number))\n            end\n        end\n	end\n\n	file:close()\nend\n\n\ngpsHz=18.14\nfps=tonumber(mediaprops.MEDIA_SRC_FRAME_RATE)\n\nprint(\"GPS loading ended\")", },
+				EndRenderScripts = Input { Value = 1, },
+			},
+			ViewInfo = OperatorInfo { Pos = { 55, 82.5 } },
+		},
+		TimeCode1 = TimeCode {
+			CtrlWZoom = false,
+			Inputs = {
+				FramesPerSecond = Input { Value = 60, },
+			},
+		}
+	}
+}
