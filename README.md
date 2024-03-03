@@ -7,6 +7,8 @@ DaVinci Resolve Text config to Display GPS speed and coordinates embedded in GoP
 Uses [ExifTool](https://exiftool.org/) to extract GPS data from your GoPro .mp4 file and displays it in a DaVinci Resolve Fusion Text+ object.
 The extracted data is saved to a file with the same name as the source video file with the added extension ".track", this makes subsequent loading faster.
 
+![Example with speed and heigth above sea level](gpsText.JPG)
+
 ## Usage
 
 Go into Fusion, drop a Text+ object between MediaIn1 and your MediaOut, then right click on your Text+ object and select Settings>Load...  Load the settings file provided in this repro. You can modify the Text+ object as you like, but to modify the text string you have to modify the "Frame Render Script".
